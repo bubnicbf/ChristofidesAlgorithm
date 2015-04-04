@@ -60,16 +60,16 @@ public class Christofides{
 				Vector tmpPath = new Vector();
 				int j=0;
 				
-				//lägg in första cykeln i path, getNextChild går djupet först och retu
+				//Add the first cycle in the path, getNextChild goes depth first
 				nodes[0].getNextChild( nodes[0].getName(), tmpPath, true );
 				path.addAll(0, tmpPath);
 				
-				//gå igenom alla noder i vår path, om noden har fler utgående kanter så kolla cykler efter denna. stopp in cykeln på rätt plats
+				//go through all the nodes in our path, if the node has more outgoing edges so check cycles after this. stop the bike in the right place
 				while(j < path.size()) {
 						if(nodes[((Integer)path.get(j)).intValue()].hasMoreChilds()) {
 								nodes[((Integer)path.get(j)).intValue()].getNextChild( nodes[((Integer)path.get(j)).intValue()].getName(),tmpPath,true );
 								if(tmpPath.size()>0) {
-										//sätt ihop path och tmpPath
+										//reassemble the path and tmpPath
 										for(int i = 0; i < path.size(); i++) {
 												if( ((Integer)path.get(i)).intValue() == ((Integer)tmpPath.elementAt(0)).intValue() ) {
 														path.addAll(i, tmpPath);
@@ -83,7 +83,7 @@ public class Christofides{
 						else j++;
 				}
 					
-				//hitta genvägar på Euler-turen
+				//find shortcuts Eulerian walk
 				boolean inPath[]=new boolean[nodes.length];
 				int[] route=new int[nodes.length];
 				j=0;
@@ -110,17 +110,17 @@ public class Christofides{
 
 		private GraphNode[] buildMultiGraph(int[][] match, int[] mst) {
 				GraphNode nodes[]=new GraphNode[mst.length];
-				//skapa tomma noder
+				//create empty nodes
 				for(int i=0;i<mst.length;i++){
 						nodes[i]=new GraphNode(i);
 				}
 				
-				//lägg till noder och kanter från MST, symmetriska kanter!
+				//add nodes and edges of the MST, symmetrical edges
 				for(int i=1;i<mst.length;i++){
 						nodes[i].addChild(nodes[mst[i]]);
 						nodes[mst[i]].addChild(nodes[i]);				}
 				
-				//lägg till noder och kanter från MATCHNING, symmetriska kanter!
+				//add nodes and edges from MATCHING, symmetrical edges
 				for(int i=0;i<match.length;i++){
 						nodes[match[i][0]].addChild(nodes[match[i][1]]);
 						nodes[match[i][1]].addChild(nodes[match[i][0]]);
@@ -180,7 +180,7 @@ public class Christofides{
 
 				// Prim's algorithm
 				boolean isInTree[] = new boolean[dim];
-				double key[]=new double[dim]; //avstånd från nod i och nod parent[i].
+				double key[]=new double[dim]; //distance from node to node and parent [i]
 				int p[]=new int[dim]; //parent
 
 				for(int i=0;i<dim;i++){
@@ -193,19 +193,19 @@ public class Christofides{
 				double temp;
 				Integer elem;
 				do{
-						isInTree[u] = true; //lägg till noden i trädet
+						isInTree[u] = true; //add the node in the tree
 						queue.removeElement(new Integer(u));
-						for(int v=0;v<dim;v++){ // kan forenkles om det ikke er en komplett graf!
+						for(int v=0;v<dim;v++){ //can be simplified if it is not a complete graph
 								if( !isInTree[v] && wt[u][v]<key[v] ){
 										p[v]=u;
 										key[v]=wt[u][v];
 								}
 						}
 
-						// ExtractMin, går igenom alla kvarvarande noder och tar ut den med kortast avstånd till trädet
+						// ExtractMin goes through all the remaining nodes and removing it with the shortest distance to the tree
 						double mint=Double.MAX_VALUE;
 						for(int i=0;i<queue.size();i++){
-								elem=(Integer)queue.elementAt(i); //ineffektivt
+								elem=(Integer)queue.elementAt(i); //ineffective
 								temp=key[elem.intValue()];
 								if(temp<mint){
 										u=elem.intValue();
@@ -251,19 +251,19 @@ public class Christofides{
 
 				Node nodes[] = new Node[p.length];
 
-				//skapa en skog
+				//create the forest
 				nodes[0] = new Node(0, true); //roten
 				for(int i =1; i<p.length;i++) {
 						nodes[i] = new Node(i,false);
 				}
 
-				//bygg ett träd av skogen
+				//building a tree in the forest
 				for(int i = 0; i<p.length;i++) {
 						if(p[i]!=i)
 								nodes[p[i]].addChild(nodes[i]);
 				}
 
-				//hitta udda noder
+				//find the odd nodes
 				ArrayList oddDegreeNodes = findOddDegreeNodes(nodes[0]);
 				int nOdd = oddDegreeNodes.size();
 
@@ -274,8 +274,7 @@ public class Christofides{
 						System.out.println();
 				}
 
-				//försök hitta en så minimal matchning som möjligt med en girig metod
-				//sortera alla kanter mellan de udda hörnen
+				//try to find a match so minimal as possible with a greedy algorithm to sort all the edges between the odd corners
 				Edge edges[][] = new Edge[nOdd][nOdd];
 				for(int i = 0; i < nOdd; i++) {
 						for(int j = 0; j < nOdd; j++) {
@@ -287,15 +286,13 @@ public class Christofides{
 										edges[i][j] = new Edge( ((Integer)oddDegreeNodes.get(i)).intValue(),
 																						((Integer)oddDegreeNodes.get(j)).intValue(),Double.MAX_VALUE );
 						}
-						Arrays.sort(edges[i]); //sortera alla kanter från nod i
+						Arrays.sort(edges[i]); //browse all edges from node i
 				}
 
 				boolean matched[] = new boolean[dim];
 				int match[][] = new int[(nOdd/2)][2];
 
-				// för varje hörn plocka ut den kortaste kanten
-				// vid krock välj den kortaste av de näst kortaste.
-				// antalet noder med udda gradtal alltid delbart med 2
+				// for each corner, pick the shortest edge in crash select the shortest of the second shortest number of nodes with odd degrees always divisible by 2
 				int k = 0;
 				for(int i = 0; i < nOdd; i++) {
 						for(int j = 0; j < nOdd; j++) {
