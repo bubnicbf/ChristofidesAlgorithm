@@ -62,7 +62,7 @@ The class provides methods for adding and removing children nodes, as well as ch
 
 ## TSP Solution
 
-To solve the traveling salesman problem using the code you provided, you can follow these steps:
+To solve the traveling salesman problem using the code, you can follow these steps:
 
 1. Create a double[][] matrix representing the distances between all the cities you want to visit. You can use the ChristofidesManager class's readDistanceMatrix method to read the matrix from a file, or you can manually create the matrix in your code.
 
